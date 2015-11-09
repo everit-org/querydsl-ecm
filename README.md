@@ -10,6 +10,7 @@ it possible to create SQLTemplates instances via configuration and register Quer
    the connection metadata it decides which type of SQLTemplates it should
    instantiate.
  - QuerydslConfigurationComponent: This component register QueryDSL Configuration instance.
+ - QuerydslSupportComponent: This component registers a QuerydslSupport instance.
 
 To see the all the configuration possibilities, deploy the module to your
 OSGi container and check the configuration possibilities in webconsole.

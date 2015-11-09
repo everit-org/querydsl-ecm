@@ -79,7 +79,7 @@
               *
             </Import-Package>
             <Export-Package />
-            <EOSGi-TestNum>3</EOSGi-TestNum>
+            <EOSGi-TestNum>4</EOSGi-TestNum>
           </instructions>
         </configuration>
       </plugin>
