@@ -149,7 +149,7 @@ public enum DBMSType {
   SQLSERVER {
     @Override
     boolean fitsMajorVersion(final int majorVersion) {
-      return majorVersion < VERSION_NINE;
+      return majorVersion < VERSION_SQLSERVER_2005;
     }
 
     @Override
@@ -171,7 +171,7 @@ public enum DBMSType {
   SQLSERVER_2005 {
     @Override
     boolean fitsMajorVersion(final int majorVersion) {
-      return majorVersion == VERSION_NINE;
+      return majorVersion == VERSION_SQLSERVER_2005;
     }
 
     @Override
@@ -192,7 +192,7 @@ public enum DBMSType {
   SQLSERVER_2008 {
     @Override
     boolean fitsMajorVersion(final int majorVersion) {
-      return majorVersion == VERSION_TEN;
+      return majorVersion == VERSION_SQLSERVER_2008;
     }
 
     @Override
@@ -213,7 +213,7 @@ public enum DBMSType {
   SQLSERVER_2012 {
     @Override
     boolean fitsMajorVersion(final int majorVersion) {
-      return majorVersion > VERSION_TEN;
+      return majorVersion > VERSION_SQLSERVER_2008;
     }
 
     @Override
@@ -229,17 +229,6 @@ public enum DBMSType {
     @Override
     public String toString() {
       return TYPE_SQLSERVER_2012;
-    }
-  },
-  SYBASE {
-    @Override
-    public String getProductName() {
-      return "Sybase";
-    }
-
-    @Override
-    public Builder getSQLTemplatesBuilder() {
-      throw new UnsupportedOperationException("not yet implemented");
     }
   },
   TERADATA {
@@ -269,8 +258,8 @@ public enum DBMSType {
   public static final String TYPE_SQLSERVER_2008 = "SQLServer2008";
   public static final String TYPE_SQLSERVER_2012 = "SQLServer2012";
   public static final String TYPE_TERADATA = "Teradata";
-  private static final int VERSION_NINE = 9;
-  private static final int VERSION_TEN = 10;
+  private static final int VERSION_SQLSERVER_2005 = 9;
+  private static final int VERSION_SQLSERVER_2008 = 10;
 
   /**
    * Gets {@link DBMSType} based on product name and major version.

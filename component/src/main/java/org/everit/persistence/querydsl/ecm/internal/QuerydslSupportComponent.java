@@ -25,11 +25,12 @@ import org.everit.osgi.ecm.annotation.Component;
 import org.everit.osgi.ecm.annotation.ConfigurationPolicy;
 import org.everit.osgi.ecm.annotation.Deactivate;
 import org.everit.osgi.ecm.annotation.ManualService;
+import org.everit.osgi.ecm.annotation.ManualServices;
 import org.everit.osgi.ecm.annotation.ServiceRef;
 import org.everit.osgi.ecm.annotation.attribute.StringAttribute;
 import org.everit.osgi.ecm.annotation.attribute.StringAttributes;
 import org.everit.osgi.ecm.component.ComponentContext;
-import org.everit.osgi.ecm.extender.ECMExtenderConstants;
+import org.everit.osgi.ecm.extender.ExtendComponent;
 import org.everit.persistence.querydsl.ecm.QuerydslSupportConstants;
 import org.everit.persistence.querydsl.support.QuerydslSupport;
 import org.everit.persistence.querydsl.support.ri.QuerydslSupportImpl;
@@ -38,24 +39,21 @@ import org.osgi.framework.ServiceRegistration;
 
 import com.querydsl.sql.Configuration;
 
-import aQute.bnd.annotation.headers.ProvideCapability;
-
 /**
  * ECM component for {@link QuerydslSupport} interface based on {@link QuerydslSupportImpl}.
  */
+@ExtendComponent
 @Component(componentId = QuerydslSupportConstants.SERVICE_FACTORYPID_QUERYDSL_SUPPORT,
     configurationPolicy = ConfigurationPolicy.FACTORY,
     label = "Everit Querydsl Support",
     description = "Component that registers a QuerydslSupport OSGi service.")
-@ProvideCapability(ns = ECMExtenderConstants.CAPABILITY_NS_COMPONENT,
-    value = ECMExtenderConstants.CAPABILITY_ATTR_CLASS + "=${@class}")
 @StringAttributes({
     @StringAttribute(attributeId = Constants.SERVICE_DESCRIPTION,
         defaultValue = QuerydslSupportConstants.DEFAULT_SERVICE_DESCRIPTION,
         priority = QuerydslSupportComponent.P00_SERVICE_DESCRIPTION, label = "Service Description",
         description = "The description of this component configuration. It is used to easily "
             + "identify the service registered by this component.") })
-@ManualService(QuerydslSupport.class)
+@ManualServices(@ManualService(QuerydslSupport.class))
 public class QuerydslSupportComponent {
 
   public static final int P00_SERVICE_DESCRIPTION = 0;

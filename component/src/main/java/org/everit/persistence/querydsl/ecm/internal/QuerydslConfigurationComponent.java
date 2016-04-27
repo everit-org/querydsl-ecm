@@ -24,13 +24,14 @@ import org.everit.osgi.ecm.annotation.Component;
 import org.everit.osgi.ecm.annotation.ConfigurationPolicy;
 import org.everit.osgi.ecm.annotation.Deactivate;
 import org.everit.osgi.ecm.annotation.ManualService;
+import org.everit.osgi.ecm.annotation.ManualServices;
 import org.everit.osgi.ecm.annotation.ServiceRef;
 import org.everit.osgi.ecm.annotation.attribute.BooleanAttribute;
 import org.everit.osgi.ecm.annotation.attribute.BooleanAttributes;
 import org.everit.osgi.ecm.annotation.attribute.StringAttribute;
 import org.everit.osgi.ecm.annotation.attribute.StringAttributes;
 import org.everit.osgi.ecm.component.ComponentContext;
-import org.everit.osgi.ecm.extender.ECMExtenderConstants;
+import org.everit.osgi.ecm.extender.ExtendComponent;
 import org.everit.persistence.querydsl.ecm.QuerydslConfigurationConstants;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
@@ -38,36 +39,33 @@ import org.osgi.framework.ServiceRegistration;
 import com.querydsl.sql.Configuration;
 import com.querydsl.sql.SQLTemplates;
 
-import aQute.bnd.annotation.headers.ProvideCapability;
-
 /**
  * Simple component that registers Querydsl configuration as an OSGi service.
  */
+@ExtendComponent
 @Component(componentId = QuerydslConfigurationConstants.SERVICE_FACTORYPID_QUERYDSL_CONFIGURATION,
     configurationPolicy = ConfigurationPolicy.FACTORY, label = "Everit Querydsl Configuration",
-    description = "A Component that registers Querydsl Configuration instance as OSGi service.")
-@ProvideCapability(ns = ECMExtenderConstants.CAPABILITY_NS_COMPONENT,
-    value = ECMExtenderConstants.CAPABILITY_ATTR_CLASS + "=${@class}")
+    description = "Registers Querydsl Configuration instance as OSGi service.")
 @BooleanAttributes({
     @BooleanAttribute(attributeId = QuerydslConfigurationConstants.ATTR_USE_LITERALS,
-        defaultValue = false, priority = QuerydslConfigurationComponent.P02_USE_LITERALS,
+        defaultValue = false, priority = QuerydslConfigurationComponent.P_USE_LITERALS,
         label = "Use literals",
         description = "Whether to use literals in SQL statements or not.") })
 @StringAttributes({
     @StringAttribute(attributeId = Constants.SERVICE_DESCRIPTION,
         defaultValue = QuerydslConfigurationConstants.DEFAULT_SERVICE_DESCRIPTION,
-        priority = QuerydslConfigurationComponent.P00_SERVICE_DESCRIPTION,
+        priority = QuerydslConfigurationComponent.P_SERVICE_DESCRIPTION,
         label = "Service description",
         description = "The description of this component configuration. It is used to easily "
             + "identify the service registered by this component.") })
-@ManualService(Configuration.class)
+@ManualServices(@ManualService(Configuration.class))
 public class QuerydslConfigurationComponent {
 
-  public static final int P00_SERVICE_DESCRIPTION = 0;
+  public static final int P_SERVICE_DESCRIPTION = 0;
 
-  public static final int P01_SQL_TEMPLATES = 1;
+  public static final int P_SQL_TEMPLATES = 1;
 
-  public static final int P02_USE_LITERALS = 2;
+  public static final int P_USE_LITERALS = 2;
 
   private ServiceRegistration<Configuration> serviceRegistration;
 
@@ -107,7 +105,7 @@ public class QuerydslConfigurationComponent {
   }
 
   @ServiceRef(attributeId = QuerydslConfigurationConstants.ATTR_SQL_TEMPLATES_TARGET,
-      defaultValue = "", attributePriority = P01_SQL_TEMPLATES,
+      defaultValue = "", attributePriority = P_SQL_TEMPLATES,
       label = "SQLTemplates OSGi filter",
       description = "OSGi filter for the sqlTemplates reference that will be embedded into the "
           + "configuration.")

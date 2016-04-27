@@ -31,7 +31,7 @@ public final class QuerydslConfigurationConstants {
   public static final String ATTR_USE_LITERALS = "useLiterals";
 
   public static final String DEFAULT_SERVICE_DESCRIPTION =
-      "Default Querydsl Configuration Component";
+      "Everit Querydsl Configuration";
 
   /**
    * The name of the component.

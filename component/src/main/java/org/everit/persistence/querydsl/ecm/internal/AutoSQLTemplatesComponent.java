@@ -20,107 +20,61 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.everit.osgi.ecm.annotation.Activate;
 import org.everit.osgi.ecm.annotation.Component;
 import org.everit.osgi.ecm.annotation.ConfigurationPolicy;
+import org.everit.osgi.ecm.annotation.ManualService;
+import org.everit.osgi.ecm.annotation.ManualServices;
 import org.everit.osgi.ecm.annotation.ServiceRef;
-import org.everit.osgi.ecm.annotation.attribute.StringAttribute;
-import org.everit.osgi.ecm.annotation.attribute.StringAttributes;
-import org.everit.osgi.ecm.component.ComponentContext;
-import org.everit.osgi.ecm.extender.ECMExtenderConstants;
+import org.everit.osgi.ecm.extender.ExtendComponent;
 import org.everit.persistence.querydsl.ecm.DBMSType;
 import org.everit.persistence.querydsl.ecm.SQLTemplatesConstants;
-import org.osgi.framework.Constants;
-import org.osgi.service.log.LogService;
 
 import com.querydsl.sql.SQLTemplates;
-import com.querydsl.sql.SQLTemplates.Builder;
-
-import aQute.bnd.annotation.headers.ProvideCapability;
 
 /**
  * Component that automatically detects the type of the database based on the referenced DataSource
  * and registers the right type of SQLTemplates instance.
  */
-
+@ExtendComponent
 @Component(componentId = SQLTemplatesConstants.SERVICE_FACTORY_PID_AUTO_SQL_TEMPLATES,
     configurationPolicy = ConfigurationPolicy.FACTORY,
-    label = "QueryDSL SQLTemplates (Auto) (Everit)",
+    label = "Everit QueryDSL Auto SQLTemplates",
     description = "By configuring this component, the user will get an SQLTemplate as an OSGi "
         + "service.")
-@ProvideCapability(ns = ECMExtenderConstants.CAPABILITY_NS_COMPONENT,
-    value = ECMExtenderConstants.CAPABILITY_ATTR_CLASS + "=${@class}")
-@StringAttributes({
-    @StringAttribute(attributeId = Constants.SERVICE_DESCRIPTION,
-        defaultValue = SQLTemplatesConstants.DEFAULT_SERVICE_DESCRIPTION_AUTO_SQL_TEMPLATES,
-        priority = AutoSQLTemplatesAttributePriority.P00_SERVICE_DESCRIPTION,
-        label = "Service description",
-        description = "The description of this component configuration. It is used to easily "
-            + "identify the service registered by this component.") })
+@ManualServices(@ManualService(SQLTemplates.class))
 public class AutoSQLTemplatesComponent extends AbstractSQLTemplatesComponent {
+
+  public static final int P_DATA_SOURCE = 1;
+
+  public static final int P_LOG_SERVICE = 10;
 
   /**
    * The datasource that is used to find out the type of the database.
    */
   private DataSource dataSource;
 
-  /**
-   * The logging service.
-   */
-  private LogService logService;
-
-  private SQLTemplates sqlTemplates;
-
-  /**
-   * Automatically configures an {@link SQLTemplates} instance based on the underlying
-   * {@code dataSource} and registers it as an OSGi service.
-   */
-  @Activate
-  public void activate(final ComponentContext<AutoSQLTemplatesComponent> componentContext) {
-    Builder sqlTemplateBuilder = null;
+  @Override
+  protected DBMSType getDBMSType() {
     String dbProductName = "";
     int dbMajorVersion = 0;
 
     try (Connection conn = dataSource.getConnection()) {
       dbProductName = conn.getMetaData().getDatabaseProductName();
       dbMajorVersion = conn.getMetaData().getDatabaseMajorVersion();
+      return DBMSType.getByProductNameAndMajorVersion(dbProductName, dbMajorVersion);
     } catch (SQLException e) {
       throw new IllegalStateException(
           "Cannot get Database product name of the given DataSource.", e);
     }
-
-    sqlTemplateBuilder = DBMSType.getByProductNameAndMajorVersion(dbProductName, dbMajorVersion)
-        .getSQLTemplatesBuilder();
-
-    new SQLTemplateConfigurator(sqlTemplateBuilder, componentContext.getProperties()).configure();
-
-    sqlTemplates = sqlTemplateBuilder.build();
-    registerService(componentContext);
-
-    logService.log(LogService.LOG_INFO,
-        "Selected template: " + sqlTemplateBuilder.getClass().getName());
-  }
-
-  @Override
-  protected SQLTemplates getSQLTemplates() {
-    return sqlTemplates;
   }
 
   @ServiceRef(attributeId = SQLTemplatesConstants.ATTR_DATA_SOURCE, defaultValue = "",
       label = "DataSource service filter",
-      attributePriority = AutoSQLTemplatesAttributePriority.P01_DATA_SOURCE,
+      attributePriority = AutoSQLTemplatesComponent.P_DATA_SOURCE,
       description = "An OSGi filter expression to select the right DataSource. The right QueryDSL "
           + "SQLTemplate will be created based on this DataSource's Database type.")
   public void setDataSource(final DataSource dataSource) {
     this.dataSource = dataSource;
-  }
-
-  @ServiceRef(attributeId = SQLTemplatesConstants.ATTR_LOG_SERVICE, defaultValue = "",
-      attributePriority = AutoSQLTemplatesAttributePriority.P10_LOG_SERVICE,
-      label = "LogService service filter",
-      description = "The OSGi filter expression of the LogService service.")
-  public void setLogService(final LogService logService) {
-    this.logService = logService;
   }
 
 }

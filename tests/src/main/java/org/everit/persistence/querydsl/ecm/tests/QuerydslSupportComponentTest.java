@@ -21,19 +21,16 @@ import org.everit.osgi.ecm.annotation.Service;
 import org.everit.osgi.ecm.annotation.ServiceRef;
 import org.everit.osgi.ecm.annotation.attribute.StringAttribute;
 import org.everit.osgi.ecm.annotation.attribute.StringAttributes;
-import org.everit.osgi.ecm.extender.ECMExtenderConstants;
+import org.everit.osgi.ecm.extender.ExtendComponent;
 import org.everit.persistence.querydsl.support.QuerydslSupport;
 import org.junit.Assert;
 import org.junit.Test;
 
-import aQute.bnd.annotation.headers.ProvideCapability;
-
 /**
  * Test for Querydsl Support Component.
  */
+@ExtendComponent
 @Component(componentId = "QuerydslSupportComponentTest")
-@ProvideCapability(ns = ECMExtenderConstants.CAPABILITY_NS_COMPONENT,
-    value = ECMExtenderConstants.CAPABILITY_ATTR_CLASS + "=${@class}")
 @StringAttributes({
     @StringAttribute(attributeId = TestRunnerConstants.SERVICE_PROPERTY_TESTRUNNER_ENGINE_TYPE,
         defaultValue = "junit4"),

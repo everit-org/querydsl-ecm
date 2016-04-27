@@ -15,115 +15,79 @@
  */
 package org.everit.persistence.querydsl.ecm.internal;
 
-import java.util.Map;
 import java.util.Objects;
 
-import org.everit.osgi.ecm.annotation.Activate;
 import org.everit.osgi.ecm.annotation.Component;
 import org.everit.osgi.ecm.annotation.ConfigurationPolicy;
+import org.everit.osgi.ecm.annotation.ManualService;
+import org.everit.osgi.ecm.annotation.ManualServices;
 import org.everit.osgi.ecm.annotation.attribute.StringAttribute;
 import org.everit.osgi.ecm.annotation.attribute.StringAttributeOption;
-import org.everit.osgi.ecm.annotation.attribute.StringAttributes;
-import org.everit.osgi.ecm.component.ComponentContext;
-import org.everit.osgi.ecm.extender.ECMExtenderConstants;
+import org.everit.osgi.ecm.extender.ExtendComponent;
 import org.everit.persistence.querydsl.ecm.DBMSType;
 import org.everit.persistence.querydsl.ecm.SQLTemplatesConstants;
 import org.everit.persistence.querydsl.ecm.UnknownDatabaseTypeException;
-import org.osgi.framework.Constants;
 
 import com.querydsl.sql.SQLTemplates;
-import com.querydsl.sql.SQLTemplates.Builder;
-
-import aQute.bnd.annotation.headers.ProvideCapability;
 
 /**
- * Component that instantiates and registers SQLTemapltes objects as OSGi service.
+ * Component that instantiates and registers SQLTemaplates objects as OSGi service.
  */
+@ExtendComponent
 @Component(componentId = SQLTemplatesConstants.SERVICE_FACTORY_PID_SQL_TEMPLATES, metatype = true,
-    configurationPolicy = ConfigurationPolicy.FACTORY, label = "QueryDSL SQLTemplates (Everit)",
+    configurationPolicy = ConfigurationPolicy.FACTORY, label = "Everit Querydsl SQLTemplates",
     description = "By configuring this component, the user will get an SQLTemplate as an "
         + "OSGi service.")
-@ProvideCapability(ns = ECMExtenderConstants.CAPABILITY_NS_COMPONENT,
-    value = ECMExtenderConstants.CAPABILITY_ATTR_CLASS + "=${@class}")
-@StringAttributes({
-    @StringAttribute(attributeId = SQLTemplatesConstants.ATTR_DB_TYPE,
-        priority = SQLTemplatesAttributePriority.P01_DB_TYPE, label = "Database type",
-        description = "Type of the SQLTemplate which will be created.",
-        defaultValue = DBMSType.TYPE_H2, options = {
-            @StringAttributeOption(label = DBMSType.TYPE_H2,
-                value = DBMSType.TYPE_H2),
-            @StringAttributeOption(label = DBMSType.TYPE_POSTGRES,
-                value = DBMSType.TYPE_POSTGRES),
-            @StringAttributeOption(label = DBMSType.TYPE_MYSQL,
-                value = DBMSType.TYPE_MYSQL),
-            @StringAttributeOption(label = DBMSType.TYPE_ORACLE,
-                value = DBMSType.TYPE_ORACLE),
-            @StringAttributeOption(label = DBMSType.TYPE_SQLITE,
-                value = DBMSType.TYPE_SQLITE),
-            @StringAttributeOption(label = DBMSType.TYPE_CUBRID,
-                value = DBMSType.TYPE_CUBRID),
-            @StringAttributeOption(label = DBMSType.TYPE_DERBY,
-                value = DBMSType.TYPE_DERBY),
-            @StringAttributeOption(label = DBMSType.TYPE_HSQLDB,
-                value = DBMSType.TYPE_HSQLDB),
-            @StringAttributeOption(label = DBMSType.TYPE_TERADATA,
-                value = DBMSType.TYPE_TERADATA),
-            @StringAttributeOption(label = DBMSType.TYPE_SQLSERVER,
-                value = DBMSType.TYPE_SQLSERVER),
-            @StringAttributeOption(label = DBMSType.TYPE_SQLSERVER_2005,
-                value = DBMSType.TYPE_SQLSERVER_2005),
-            @StringAttributeOption(label = DBMSType.TYPE_SQLSERVER_2008,
-                value = DBMSType.TYPE_SQLSERVER_2008),
-            @StringAttributeOption(label = DBMSType.TYPE_SQLSERVER_2012,
-                value = DBMSType.TYPE_SQLSERVER_2012) }),
-    @StringAttribute(attributeId = Constants.SERVICE_DESCRIPTION,
-        defaultValue = SQLTemplatesConstants.DEFAULT_SERVICE_DESCRIPTION_SQL_TEMPLATES,
-        priority = SQLTemplatesAttributePriority.P00_SERVICE_DESCRIPTION,
-        label = "Service description",
-        description = "The description of this component configuration. It is used to easily "
-            + "identify the service registered by this component.") })
+@ManualServices(@ManualService(SQLTemplates.class))
 public class SQLTemplatesComponent extends AbstractSQLTemplatesComponent {
 
-  private SQLTemplates sqlTemplate;
+  public static final int P_DB_TYPE = 1;
 
-  /**
-   * Configures an {@link SQLTemplates} instance based on {@code componentProperties} and registers
-   * it as an OSGi service using {@code context}.
-   *
-   * @throws IllegalStateException
-   *           if problem with to create service register.
-   */
-  @Activate
-  public void activate(final ComponentContext<SQLTemplatesComponent> componentContext) {
-    try {
-      Map<String, Object> componentProperties = componentContext.getProperties();
-      Object dbTypeObject = componentProperties.get(SQLTemplatesConstants.ATTR_DB_TYPE);
-      Builder sqlTemplateBuilder = instantiateBuilder((String) dbTypeObject);
-      new SQLTemplateConfigurator(sqlTemplateBuilder, componentProperties).configure();
-      sqlTemplate = sqlTemplateBuilder.build();
-    } catch (UnknownDatabaseTypeException e) {
-      throw new IllegalStateException(e);
-    } catch (NullPointerException | ClassCastException e) {
-      throw new IllegalStateException(SQLTemplatesConstants.ATTR_DB_TYPE
-          + " property must be set and must be a String", e);
-    }
-
-    registerService(componentContext);
-  }
+  private String dbType;
 
   @Override
-  protected SQLTemplates getSQLTemplates() {
-    return sqlTemplate;
-  }
-
-  private Builder instantiateBuilder(final String dbType) {
+  protected DBMSType getDBMSType() {
     Objects.requireNonNull(dbType, "dbType cannot be null");
-    for (DBMSType type : DBMSType.values()) {
-      if (type.toString().equals(dbType)) {
-        return type.getSQLTemplatesBuilder();
+    for (DBMSType dbmsType : DBMSType.values()) {
+      if (dbmsType.toString().equals(dbType)) {
+        return dbmsType;
       }
     }
     throw new UnknownDatabaseTypeException("database type [" + dbType + "] is not supported");
+  }
+
+  @StringAttribute(attributeId = SQLTemplatesConstants.ATTR_DB_TYPE,
+      priority = SQLTemplatesComponent.P_DB_TYPE, label = "Database type",
+      description = "Type of the SQLTemplate which will be created.",
+      defaultValue = DBMSType.TYPE_H2, options = {
+          @StringAttributeOption(label = DBMSType.TYPE_H2,
+              value = DBMSType.TYPE_H2),
+          @StringAttributeOption(label = DBMSType.TYPE_POSTGRES,
+              value = DBMSType.TYPE_POSTGRES),
+          @StringAttributeOption(label = DBMSType.TYPE_MYSQL,
+              value = DBMSType.TYPE_MYSQL),
+          @StringAttributeOption(label = DBMSType.TYPE_ORACLE,
+              value = DBMSType.TYPE_ORACLE),
+          @StringAttributeOption(label = DBMSType.TYPE_SQLITE,
+              value = DBMSType.TYPE_SQLITE),
+          @StringAttributeOption(label = DBMSType.TYPE_CUBRID,
+              value = DBMSType.TYPE_CUBRID),
+          @StringAttributeOption(label = DBMSType.TYPE_DERBY,
+              value = DBMSType.TYPE_DERBY),
+          @StringAttributeOption(label = DBMSType.TYPE_HSQLDB,
+              value = DBMSType.TYPE_HSQLDB),
+          @StringAttributeOption(label = DBMSType.TYPE_TERADATA,
+              value = DBMSType.TYPE_TERADATA),
+          @StringAttributeOption(label = DBMSType.TYPE_SQLSERVER,
+              value = DBMSType.TYPE_SQLSERVER),
+          @StringAttributeOption(label = DBMSType.TYPE_SQLSERVER_2005,
+              value = DBMSType.TYPE_SQLSERVER_2005),
+          @StringAttributeOption(label = DBMSType.TYPE_SQLSERVER_2008,
+              value = DBMSType.TYPE_SQLSERVER_2008),
+          @StringAttributeOption(label = DBMSType.TYPE_SQLSERVER_2012,
+              value = DBMSType.TYPE_SQLSERVER_2012) })
+  public void setDbType(final String dbtype) {
+    this.dbType = dbtype;
   }
 
 }

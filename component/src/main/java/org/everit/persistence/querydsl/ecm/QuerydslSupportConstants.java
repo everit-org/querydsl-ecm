@@ -30,7 +30,7 @@ public final class QuerydslSupportConstants {
    */
   public static final String ATTR_DATA_SOURCE_TARGET = "dataSource.target";
 
-  public static final String DEFAULT_SERVICE_DESCRIPTION = "Querydsl Support Component";
+  public static final String DEFAULT_SERVICE_DESCRIPTION = "Everit Querydsl Support";
 
   /**
    * The name of the component.

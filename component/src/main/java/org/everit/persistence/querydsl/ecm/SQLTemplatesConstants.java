@@ -22,11 +22,9 @@ public final class SQLTemplatesConstants {
 
   public static final String ATTR_DATA_SOURCE = "dataSource.target";
 
-  public static final String ATTR_DB_TYPE = "dbtype";
+  public static final String ATTR_DB_TYPE = "dbType";
 
   public static final String ATTR_ESCAPE = "escape";
-
-  public static final String ATTR_LOG_SERVICE = "logService.target";
 
   public static final String ATTR_NEW_LINE_TO_SINGLE_SPACE = "newLineToSingleSpace";
 
@@ -36,11 +34,8 @@ public final class SQLTemplatesConstants {
 
   public static final String ATTR_SELECTED_TEMPLATE = "selected";
 
-  public static final String DEFAULT_SERVICE_DESCRIPTION_AUTO_SQL_TEMPLATES =
-      "Default Auto SQL Template Component";
-
   public static final String DEFAULT_SERVICE_DESCRIPTION_SQL_TEMPLATES =
-      "Default SQL Template Component";
+      "Everit Querydsl SQLTemplates";
 
   public static final String SERVICE_FACTORY_PID_AUTO_SQL_TEMPLATES =
       "org.everit.persistence.querydsl.ecm.AutoSQLTemplates";
