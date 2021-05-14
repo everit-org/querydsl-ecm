@@ -21,6 +21,11 @@ package org.everit.persistence.querydsl.ecm;
 public final class QuerydslConfigurationConstants {
 
   /**
+   * OSGi service filter for the Querydsl NameMapping service.
+   */
+  public static final String ATTR_NAME_MAPPING_TARGET = "nameMapping.target";
+
+  /**
    * OSGi service filter for the Querydsl SQLTemplates service.
    */
   public static final String ATTR_SQL_TEMPLATES_TARGET = "sqlTemplates.target";

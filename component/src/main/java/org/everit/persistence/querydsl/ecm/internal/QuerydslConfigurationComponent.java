@@ -38,6 +38,7 @@ import org.osgi.framework.ServiceRegistration;
 
 import com.querydsl.sql.Configuration;
 import com.querydsl.sql.SQLTemplates;
+import com.querydsl.sql.namemapping.NameMapping;
 
 /**
  * Simple component that registers Querydsl configuration as an OSGi service.
@@ -61,11 +62,15 @@ import com.querydsl.sql.SQLTemplates;
 @ManualServices(@ManualService(Configuration.class))
 public class QuerydslConfigurationComponent {
 
+  private static final int P_NAME_MAPPING = 3;
+
   public static final int P_SERVICE_DESCRIPTION = 0;
 
   public static final int P_SQL_TEMPLATES = 1;
 
   public static final int P_USE_LITERALS = 2;
+
+  private NameMapping nameMapping;
 
   private ServiceRegistration<Configuration> serviceRegistration;
 
@@ -79,7 +84,7 @@ public class QuerydslConfigurationComponent {
    */
   @Activate
   public void activate(final ComponentContext<QuerydslConfigurationComponent> componentContext) {
-    Configuration configuration = new Configuration(sqlTemplates);
+    Configuration configuration = new Configuration(this.sqlTemplates);
 
     Map<String, Object> componentPropeties = componentContext.getProperties();
     Object useLiteralsProp =
@@ -87,10 +92,13 @@ public class QuerydslConfigurationComponent {
     if (useLiteralsProp != null) {
       configuration.setUseLiterals(Boolean.valueOf(useLiteralsProp.toString()));
     }
+    if (this.nameMapping != null) {
+      configuration.setDynamicNameMapping(this.nameMapping);
+    }
 
     Dictionary<String, Object> serviceProperties =
-        new Hashtable<String, Object>(componentPropeties);
-    serviceRegistration =
+        new Hashtable<>(componentPropeties);
+    this.serviceRegistration =
         componentContext.registerService(Configuration.class, configuration, serviceProperties);
   }
 
@@ -99,13 +107,23 @@ public class QuerydslConfigurationComponent {
    */
   @Deactivate
   public void deactivate() {
-    if (serviceRegistration != null) {
-      serviceRegistration.unregister();
+    if (this.serviceRegistration != null) {
+      this.serviceRegistration.unregister();
     }
   }
 
+  @ServiceRef(attributeId = QuerydslConfigurationConstants.ATTR_NAME_MAPPING_TARGET,
+      attributePriority = QuerydslConfigurationComponent.P_NAME_MAPPING,
+      optional = true,
+      label = "NameMapping OSGi filter",
+      description = "OSGi filter for the nameMapping reference that will be used for "
+          + "dynamic name mapping if available.")
+  public void setNameMapping(final NameMapping nameMapping) {
+    this.nameMapping = nameMapping;
+  }
+
   @ServiceRef(attributeId = QuerydslConfigurationConstants.ATTR_SQL_TEMPLATES_TARGET,
-      defaultValue = "", attributePriority = P_SQL_TEMPLATES,
+      defaultValue = "", attributePriority = QuerydslConfigurationComponent.P_SQL_TEMPLATES,
       label = "SQLTemplates OSGi filter",
       description = "OSGi filter for the sqlTemplates reference that will be embedded into the "
           + "configuration.")

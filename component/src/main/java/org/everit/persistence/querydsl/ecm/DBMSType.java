@@ -264,7 +264,7 @@ public enum DBMSType {
   /**
    * Gets {@link DBMSType} based on product name and major version.
    */
-  public static final DBMSType getByProductNameAndMajorVersion(final String productName,
+  public static DBMSType getByProductNameAndMajorVersion(final String productName,
       final int majorVersion) {
     for (DBMSType type : DBMSType.values()) {
       if (type.getProductName().equals(productName) && type.fitsMajorVersion(majorVersion)) {

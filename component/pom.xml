@@ -18,12 +18,12 @@
   <parent>
     <groupId>org.everit.config</groupId>
     <artifactId>org.everit.config.oss</artifactId>
-    <version>7.3.0</version>
+    <version>9.0.0</version>
   </parent>
 
   <groupId>org.everit.persistence</groupId>
   <artifactId>org.everit.persistence.querydsl.ecm</artifactId>
-  <version>2.0.0</version>
+  <version>2.1.0</version>
 
   <packaging>bundle</packaging>
   <name>Everit - QueryDSL ECM</name>
@@ -97,6 +97,11 @@
   </build>
 
   <dependencies>
+    <dependency>
+      <groupId>com.querydsl</groupId>
+      <artifactId>querydsl-sql</artifactId>
+      <version>4.2.0</version>
+    </dependency>
     <dependency>
       <groupId>org.everit.persistence</groupId>
       <artifactId>org.everit.persistence.querydsl.support</artifactId>
